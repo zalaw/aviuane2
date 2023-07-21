@@ -1,0 +1,381 @@
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  height: 100%;
+}
+
+body {
+  height: 100%;
+}
+
+#root {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.navbar {
+  padding: 2rem;
+}
+
+.main-container {
+  flex-grow: 1;
+  display: flex;
+  gap: 4rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  padding: 4rem;
+}
+
+.grid-container {
+  display: flex;
+  flex-wrap: wrap;
+  box-shadow: 0 0 0 1px rgba(0, 0, 255, 0.25);
+  position: relative;
+}
+
+.cell {
+  background-color: rgba(0, 0, 255, 0.05);
+  box-shadow: 0 0 0 1px rgba(0, 0, 255, 0.25);
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.marker {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.marker-col {
+  top: -100%
+}
+
+.marker-row {
+  left: -100%;
+}
+
+.plane {
+  position: absolute;
+}
+
+.plane-piece {
+  width: 2rem;
+  height: 2rem;
+  background-color: rgba(0, 0, 255, 0.35);
+  position: absolute;
+}
+
+.big-wing {
+  top: 2rem;
+}
+
+.bw1 {
+  left: -4rem;
+}
+
+.bw2 {
+  left: -2rem;
+}
+
+.bw4 {
+  left: 2rem;
+}
+
+.bw5 {
+  left: 4rem;
+}
+
+.body {
+  top: 4rem;
+}
+
+.small-wing {
+  top: 6rem;
+}
+
+.sw1 {
+  left: -2rem;
+}
+
+.sw3 {
+  left: 2rem;
+}
+
+.plane.E .bw1 {
+  left: -2rem;
+  top: -4rem;
+}
+
+.plane.E .bw2 {
+  left: -2rem;
+  top: -2rem;
+}
+
+.plane.E .bw3 {
+  left: -2rem;
+  top: 0rem;
+}
+
+.plane.E .bw4 {
+  left: -2rem;
+  top: 2rem;
+}
+
+.plane.E .bw5 {
+  left: -2rem;
+  top: 4rem;
+}
+
+.plane.E .b1 {
+  left: -4rem;
+  top: 0rem;
+}
+
+.plane.E .sw1 {
+  left: -6rem;
+  top: -2rem;
+}
+
+.plane.E .sw2 {
+  left: -6rem;
+  top: 0rem;
+}
+
+.plane.E .sw3 {
+  left: -6rem;
+  top: 2rem;
+}
+
+.plane.S .bw1 {
+  left: -4rem;
+  top: -2rem;
+}
+
+.plane.S .bw2 {
+  left: -2rem;
+  top: -2rem;
+}
+
+.plane.S .bw3 {
+  left: 0rem;
+  top: -2rem;
+}
+
+.plane.S .bw4 {
+  left: 2rem;
+  top: -2rem;
+}
+
+.plane.S .bw5 {
+  left: 4rem;
+  top: -2rem;
+}
+
+.plane.S .b1 {
+  left: 0rem;
+  top: -4rem;
+}
+
+.plane.S .sw1 {
+  left: -2rem;
+  top: -6rem;
+}
+
+.plane.S .sw2 {
+  left: 0rem;
+  top: -6rem;
+}
+
+.plane.S .sw3 {
+  left: 2rem;
+  top: -6rem;
+}
+
+.plane.W .bw1 {
+  left: 2rem;
+  top: -4rem;
+}
+
+.plane.W .bw2 {
+  left: 2rem;
+  top: -2rem;
+}
+
+.plane.W .bw3 {
+  left: 2rem;
+  top: 0rem;
+}
+
+.plane.W .bw4 {
+  left: 2rem;
+  top: 2rem;
+}
+
+.plane.W .bw5 {
+  left: 2rem;
+  top: 4rem;
+}
+
+.plane.W .b1 {
+  left: 4rem;
+  top: 0rem;
+}
+
+.plane.W .sw1 {
+  left: 6rem;
+  top: -2rem;
+}
+
+.plane.W .sw2 {
+  left: 6rem;
+  top: 0rem;
+}
+
+.plane.W .sw3 {
+  left: 6rem;
+  top: 2rem;
+}
+
+.plane.N .h1 {
+  border-top: 2px solid blue;
+  border-left: 2px solid blue;
+  border-right: 2px solid blue;
+}
+
+.plane.E .h1 {
+  border-top: 2px solid blue;
+  border-bottom: 2px solid blue;
+  border-right: 2px solid blue;
+}
+
+.plane.S .h1 {
+  border-left: 2px solid blue;
+  border-bottom: 2px solid blue;
+  border-right: 2px solid blue;
+}
+
+.plane.W .h1 {
+  border-top: 2px solid blue;
+  border-bottom: 2px solid blue;
+  border-left: 2px solid blue;
+}
+
+.plane.N .bw1,
+.plane.S .bw1 {
+  border-top: 2px solid blue;
+  border-left: 2px solid blue;
+  border-bottom: 2px solid blue;
+}
+
+.plane.E .bw1,
+.plane.W .bw1 {
+  border-top: 2px solid blue;
+  border-left: 2px solid blue;
+  border-right: 2px solid blue;
+}
+
+.plane.N .bw2,
+.plane.S .bw2 {
+  border-top: 2px solid blue;
+  border-bottom: 2px solid blue;
+}
+
+.plane.E .bw2,
+.plane.W .bw2 {
+  border-left: 2px solid blue;
+  border-right: 2px solid blue;
+}
+
+.plane.N .bw4,
+.plane.S .bw4 {
+  border-top: 2px solid blue;
+  border-bottom: 2px solid blue;
+}
+
+.plane.E .bw4,
+.plane.W .bw4 {
+  border-left: 2px solid blue;
+  border-right: 2px solid blue;
+}
+
+.plane.N .bw5,
+.plane.S .bw5 {
+  border-top: 2px solid blue;
+  border-right: 2px solid blue;
+  border-bottom: 2px solid blue;
+}
+
+.plane.E .bw5,
+.plane.W .bw5 {
+  border-bottom: 2px solid blue;
+  border-left: 2px solid blue;
+  border-right: 2px solid blue;
+}
+
+.plane.N .b1,
+.plane.S .b1 {
+  border-left: 2px solid blue;
+  border-right: 2px solid blue;
+}
+
+.plane.E .b1,
+.plane.W .b1 {
+  border-top: 2px solid blue;
+  border-bottom: 2px solid blue;
+}
+
+.plane.N .sw1,
+.plane.S .sw1 {
+  border-top: 2px solid blue;
+  border-left: 2px solid blue;
+  border-bottom: 2px solid blue;
+}
+
+.plane.E .sw1,
+.plane.W .sw1 {
+  border-top: 2px solid blue;
+  border-left: 2px solid blue;
+  border-right: 2px solid blue;
+}
+
+.plane.N .sw2 {
+  border-bottom: 2px solid blue;
+}
+
+.plane.E .sw2 {
+  border-left: 2px solid blue;
+}
+
+.plane.N .sw3,
+.plane.S .sw3 {
+  border-top: 2px solid blue;
+  border-right: 2px solid blue;
+  border-bottom: 2px solid blue;
+}
+
+.plane.E .sw3,
+.plane.W .sw3 {
+  border-left: 2px solid blue;
+  border-right: 2px solid blue;
+  border-bottom: 2px solid blue;
+}
+
+.plane.S .sw2 {
+  border-top: 2px solid blue;
+}
+
+.plane.W .sw2 {
+  border-right: 2px solid blue;
+}
