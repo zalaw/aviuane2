@@ -1,4 +1,6 @@
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
@@ -10,16 +12,17 @@ html {
 
 body {
   height: 100%;
+  user-select: none;
 }
 
 #root {
-  height: 100%;
   display: flex;
   flex-direction: column;
+  flex: 1 1 auto;
 }
 
 .navbar {
-  padding: 2rem;
+  padding: 1rem 2rem;
 }
 
 .main-container {
@@ -28,7 +31,8 @@ body {
   gap: 4rem;
   justify-content: center;
   flex-wrap: wrap;
-  padding: 4rem;
+  padding: 6rem 2rem;
+  overflow-x: auto;
 }
 
 .grid-container {
@@ -59,7 +63,7 @@ body {
 }
 
 .marker-col {
-  top: -100%
+  top: -100%;
 }
 
 .marker-row {
@@ -68,6 +72,7 @@ body {
 
 .plane {
   position: absolute;
+  z-index: 10;
 }
 
 .plane-piece {
@@ -378,4 +383,10 @@ body {
 
 .plane.W .sw2 {
   border-right: 2px solid blue;
+}
+
+@media only screen and (max-width: 425px) {
+  html {
+    zoom: 0.8;
+  }
 }

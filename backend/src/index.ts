@@ -1,14 +1,25 @@
-import { config } from 'dotenv'
-import express, { Request, Response } from 'express'
+import { config } from "dotenv";
+import express from "express";
+import { createServer } from "http";
+import { Server } from "socket.io";
 
-config()
+config();
 
-const PORT = process.env.PORT || 3001
+const app = express();
+const PORT = process.env.PORT || 3001;
+const server = createServer(app);
 
-const app = express()
+const io = new Server(server, {
+  cors: {
+    origin: "http://localhost:3000",
+    methods: ["GET"],
+  },
+});
 
-app.get('/testing', (req: Request, res: Response) => {
-    res.send('YES')
-})
+io.on("connection", socket => {
+  console.log(`${socket.id} connected`);
+});
 
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`))
+server.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
