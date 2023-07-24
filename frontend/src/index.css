@@ -28,7 +28,7 @@ body {
 .main-container {
   flex-grow: 1;
   display: flex;
-  gap: 4rem;
+  gap: 8rem;
   justify-content: center;
   flex-wrap: wrap;
   padding: 6rem 2rem;
@@ -73,6 +73,17 @@ body {
 .plane {
   position: absolute;
   z-index: 10;
+  cursor: move;
+}
+
+.plane-not-valid .plane-piece {
+  background-color: rgba(255, 0, 0, 0.55);
+  border-color: rgba(255, 0, 0, 1) !important;
+}
+
+.plane-selected .plane-piece {
+  background-color: rgba(211, 84, 0, 0.55);
+  border-color: rgba(211, 84, 0, 1) !important;
 }
 
 .plane-piece {
