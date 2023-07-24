@@ -6,7 +6,7 @@ import Grid from './components/Grid';
 import { useGame } from './contexts/GameContext';
 
 function App() {
-  const { selectPlane } = useGame();
+  const { selectPlane, createRoom } = useGame();
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -35,6 +35,8 @@ function App() {
         <Grid primary={true} />
         <Grid />
       </div>
+
+      <button onClick={() => createRoom()}>Test</button>
     </>
   );
 }

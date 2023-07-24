@@ -1,5 +1,6 @@
 import React, { ReactNode, createContext, useContext, useEffect, useState } from "react";
 import { io, Socket } from "socket.io-client";
+import { useNavigate } from 'react-router-dom';
 
 interface IPiece {
   row: number;
@@ -16,6 +17,12 @@ export interface IPlane {
   valid: boolean;
 }
 
+export interface IClient {
+  id: string,
+  connected: boolean,
+
+}
+
 interface IRoomContext {
   socket: Socket | null;
   directions: ["N", "E", "S", "W"];
@@ -23,7 +30,9 @@ interface IRoomContext {
     gridSize: number;
     planeSelectedId: number | null,
     myPlanes: IPlane[];
+    clients: [] | [IClient] | [IClient, IClient]
   };
+  createRoom: () => void,
   selectPlane: (planeId: number | null) => void,
   handleOnStop: ({ plane, x, y }: { plane: IPlane, x: number, y: number }) => void,
   rotatePlane: (plane: IPlane, dir?: number) => void
@@ -91,7 +100,9 @@ const defaultState: IRoomContext = {
         valid: true,
       },
     ],
+    clients: []
   },
+  createRoom: () => {},
   selectPlane: () => {},
   handleOnStop: () => {},
   rotatePlane: () => {}
@@ -107,6 +118,8 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const [socket, setSocket] = useState(defaultState.socket);
   const [room, setRoom] = useState(defaultState.room);
 
+  const navigate = useNavigate();
+
   useEffect(() => {
     const s = io(process.env.RAILWAY_STATIC_URL || "http://localhost:3001", {
       reconnection: true,
@@ -117,10 +130,33 @@ export function GameProvider({ children }: { children: ReactNode }) {
 
     setSocket(s);
 
+    s.emit('CREATE_ROOM', { x: 420 }, ({ code }: { code: string }) => {
+      navigate(`/${code}`)
+    })
+
     return () => {
       s.disconnect();
     };
   }, []);
+
+  useEffect(() => {
+    if (!socket) return;
+
+    console.log('socket live')
+
+    console.log(socket);
+  }, [socket])
+
+  const createRoom = () => {
+      console.log('Sending CREATE_ROOM')
+
+    console.log(socket);
+
+    socket?.emit('CREATE_ROOM', { x: 420 }, (response: any) => {
+      console.log(response);
+    })
+    
+  }
 
   const selectPlane = (planeId: number | null) => {
     setRoom(r => ({ ...r, planeSelectedId: planeId }))
@@ -218,6 +254,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
     socket: socket,
     room: room,
     directions: defaultState.directions,
+    createRoom,
     selectPlane,
     handleOnStop,
     rotatePlane
