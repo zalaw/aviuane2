@@ -1,17 +1,18 @@
 import React from "react";
 import Draggable from "react-draggable";
-import { IPlane, useGame } from "../contexts/GameContext";
+import { useGame } from "../contexts/GameContext";
+import { IPlane } from "../shared/interfaces";
 
 interface PlaneProps {
   plane: IPlane;
 }
 
 export const Plane = ({ plane }: PlaneProps) => {
-  const { room, selectPlane, handleOnStop, rotatePlane } = useGame();
+  const { room, planeSelectedId, selectPlane, handleOnStop, rotatePlane } = useGame();
 
-  const gridSize = room.gridSize;
+  const gridSize = room!.gridSize;
 
-  const planeSelectedClass = room.planeSelectedId === plane.id ? 'plane-selected' : '';
+  const planeSelectedClass = planeSelectedId === plane.id ? 'plane-selected' : '';
   const planeNotValidClass = !plane.valid ? 'plane-not-valid' : '';
 
   const handleRotatePlane = (e: React.MouseEvent, plane: IPlane) => {

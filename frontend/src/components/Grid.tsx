@@ -9,7 +9,9 @@ interface GridProps {
 const Grid = ({ primary = false }: GridProps) => {
   const { room } = useGame();
 
-  const gridSize = room.gridSize;
+  const gridSize = room!.gridSize;
+
+  console.log(room);
 
   const cells = Array.from({ length: gridSize * gridSize }).map((_: any, index: number) => {
     const markerCol = index < gridSize ? <div className="marker marker-col">{index + 1}</div> : null;
@@ -40,7 +42,7 @@ const Grid = ({ primary = false }: GridProps) => {
       <div style={gridStyle} className="grid-container">
         {cells}
 
-        {primary && room.myPlanes.map(plane => <Plane key={plane.id} plane={plane} />)}
+        {primary && room!.clients[room!.clientTurnIndex!]?.planes.map(plane => <Plane key={plane.id} plane={plane} />)}
       </div>
     </>
   );

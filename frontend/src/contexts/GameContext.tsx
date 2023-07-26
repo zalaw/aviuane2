@@ -1,37 +1,27 @@
 import React, { ReactNode, createContext, useContext, useEffect, useState } from "react";
 import { io, Socket } from "socket.io-client";
 import { useNavigate } from 'react-router-dom';
+import { IPlane, IClient, ITurn } from '../shared/interfaces'
 
-interface IPiece {
-  row: number;
-  col: number;
-  hit: boolean;
-}
-
-export interface IPlane {
-  id: number;
-  head: IPiece;
-  pieces: IPiece[];
-  direction: "N" | "E" | "S" | "W";
-  directionIndex: number;
-  valid: boolean;
-}
-
-export interface IClient {
-  id: string,
-  connected: boolean,
-
+interface IRoom {
+  code: string,
+  clients: IClient[],
+  started: boolean,
+  finished: boolean,
+  turns: ITurn[],
+  clientTurnIndex: number | null,
+  clientWinnerId: string | null,
+  eligibleForDraw: boolean,
+  gridSize: number,
+  numOfPlanes: number
 }
 
 interface IRoomContext {
   socket: Socket | null;
-  directions: ["N", "E", "S", "W"];
-  room: {
-    gridSize: number;
-    planeSelectedId: number | null,
-    myPlanes: IPlane[];
-    clients: [] | [IClient] | [IClient, IClient]
-  };
+  directions: ["N", "E", "S", "W"];  
+  myTurnIndex: 0 | 1,
+  planeSelectedId: number | null,
+  room: IRoom | null,
   createRoom: () => void,
   selectPlane: (planeId: number | null) => void,
   handleOnStop: ({ plane, x, y }: { plane: IPlane, x: number, y: number }) => void,
@@ -41,67 +31,9 @@ interface IRoomContext {
 const defaultState: IRoomContext = {
   socket: null,
   directions: ["N", "E", "S", "W"],
-  room: {
-    gridSize: 10,
-    planeSelectedId: null,
-    myPlanes: [
-      {
-        id: 1,
-        head: { row: 0, col: 2, hit: false },
-        pieces: [
-          { row: 1, col: 0, hit: false },
-          { row: 1, col: 1, hit: false },
-          { row: 1, col: 2, hit: false },
-          { row: 1, col: 3, hit: false },
-          { row: 1, col: 4, hit: false },
-          { row: 2, col: 2, hit: false },
-          { row: 3, col: 1, hit: false },
-          { row: 3, col: 2, hit: false },
-          { row: 3, col: 3, hit: false },
-        ],
-        direction: "N",
-        directionIndex: 0,
-        valid: true,
-      },
-      {
-        id: 2,
-        head: { row: 4, col: 2, hit: false },
-        pieces: [
-          { row: 5, col: 0, hit: false },
-          { row: 5, col: 1, hit: false },
-          { row: 5, col: 2, hit: false },
-          { row: 5, col: 3, hit: false },
-          { row: 5, col: 4, hit: false },
-          { row: 6, col: 2, hit: false },
-          { row: 7, col: 1, hit: false },
-          { row: 7, col: 2, hit: false },
-          { row: 7, col: 3, hit: false },
-        ],
-        direction: "N",
-        directionIndex: 0,
-        valid: true,
-      },
-      {
-        id: 3,
-        head: { row: 3, col: 5, hit: false },
-        pieces: [
-          { row: 2, col: 7, hit: false },
-          { row: 2, col: 6, hit: false },
-          { row: 2, col: 5, hit: false },
-          { row: 2, col: 4, hit: false },
-          { row: 2, col: 3, hit: false },
-          { row: 1, col: 5, hit: false },
-          { row: 0, col: 6, hit: false },
-          { row: 0, col: 5, hit: false },
-          { row: 0, col: 4, hit: false },
-        ],
-        direction: "S",
-        directionIndex: 2,
-        valid: true,
-      },
-    ],
-    clients: []
-  },
+  myTurnIndex: 0,
+  planeSelectedId: null,
+  room: null,
   createRoom: () => {},
   selectPlane: () => {},
   handleOnStop: () => {},
@@ -116,9 +48,13 @@ export function useGame() {
 
 export function GameProvider({ children }: { children: ReactNode }) {
   const [socket, setSocket] = useState(defaultState.socket);
-  const [room, setRoom] = useState(defaultState.room);
+  const [room, setRoom] = useState<IRoom | null>(defaultState.room);
+  const [myTurnIndex, setMyTurnIndex] = useState(defaultState.myTurnIndex);
+  const [loading, setLoading] = useState(true);
 
   const navigate = useNavigate();
+
+  const code = window.location.pathname.split('/').pop();
 
   useEffect(() => {
     const s = io(process.env.RAILWAY_STATIC_URL || "http://localhost:3001", {
@@ -130,9 +66,26 @@ export function GameProvider({ children }: { children: ReactNode }) {
 
     setSocket(s);
 
-    s.emit('CREATE_ROOM', { x: 420 }, ({ code }: { code: string }) => {
-      navigate(`/${code}`)
-    })
+    if (code) {
+      s.emit('JOIN_ROOM', { code }, () => {
+        setMyTurnIndex(1);
+        navigate(`/${code}`)
+
+        setTimeout(() => {
+          setLoading(false);
+        }, 1000)
+      })
+    } else {
+      s.emit('CREATE_ROOM', null, (roomObj: IRoom) => {
+        setRoom(roomObj);
+        setMyTurnIndex(0);
+        navigate(`/${code}`)
+        
+          setTimeout(() => {
+            setLoading(false);
+          }, 1000)
+      })
+    }
 
     return () => {
       s.disconnect();
@@ -159,7 +112,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
   }
 
   const selectPlane = (planeId: number | null) => {
-    setRoom(r => ({ ...r, planeSelectedId: planeId }))
+    setRoom(r => ({ ...r!, planeSelectedId: planeId }))
   }
 
   const handleOnStop = ({ plane, x, y }: { plane: IPlane, x: number, y: number }) => {
@@ -171,17 +124,17 @@ export function GameProvider({ children }: { children: ReactNode }) {
 
     updatePieces(plane);
 
-    room.myPlanes.forEach(p => checkIfPlaneIsValid(p));
+    room!.clients[myTurnIndex].planes.forEach(p => checkIfPlaneIsValid(p));
 
-    setRoom(r => ({ ...r }));
+    updateRoomData();
   }
 
   const checkIfPlaneIsValid = (plane: IPlane) => {
     plane.valid = true;
 
-    if ([plane.head].concat(plane.pieces).some(x => x.row < 0 || x.row >= room.gridSize || x.col < 0 || x.col >= room.gridSize)) plane.valid = false;
+    if ([plane.head].concat(plane.pieces).some(x => x.row < 0 || x.row >= room!.gridSize || x.col < 0 || x.col >= room!.gridSize)) plane.valid = false;
 
-    const planesExceptThis = room.myPlanes.filter(x => x.id !== plane.id);
+    const planesExceptThis = room!.clients[myTurnIndex].planes.filter(x => x.id !== plane.id);
 
     planesExceptThis.forEach(p => {
       const overlapping = [plane.head].concat(plane.pieces).some(x => [p.head].concat(p.pieces).some(y => y.row === x.row && y.col === x.col));
@@ -201,9 +154,9 @@ export function GameProvider({ children }: { children: ReactNode }) {
 
     updatePieces(plane);
 
-    room.myPlanes.forEach(p => checkIfPlaneIsValid(p));
+    room!.clients[myTurnIndex].planes.forEach(p => checkIfPlaneIsValid(p));
 
-    setRoom(r => ({ ...r }));
+    updateRoomData();
   }
 
   const updatePieces = (plane: IPlane) => {
@@ -250,15 +203,21 @@ export function GameProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const updateRoomData = () => {
+    setRoom(r => ({ ...r! }))
+  }
+
   const value = {
     socket: socket,
-    room: room,
     directions: defaultState.directions,
+    myTurnIndex: defaultState.myTurnIndex,
+    planeSelectedId: defaultState.planeSelectedId,
+    room: room,
     createRoom,
     selectPlane,
     handleOnStop,
     rotatePlane
   }
 
-  return <GameContext.Provider value={value}>{children}</GameContext.Provider>;
+  return <GameContext.Provider value={value}>{loading ? <h1>Loading...</h1> : children}</GameContext.Provider>;
 }
